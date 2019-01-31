@@ -1,3 +1,44 @@
+import os
+from netCDF4 import Dataset
+from .utilities import strip_chars
+
+
+def gather_utm_meta(epsg_str):
+    """
+    Use if the EPSG data is associated to UTM
+    Gathers the data and returns a dictionary of data and attributes that need
+    to be added to the netcdf based on
+    https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/reference/StandardCoordinateTransforms.html
+
+    Args:
+        epsg_str: String received from the epsg request.
+
+    Returns:
+        map_meta: dictionary of UTM projection data to be added to the netcdf
+    """
+    meta = epsg_str.lower()
+
+    map_meta = {
+                    "grid_mapping_name": "universal_transverse_mercator",
+                    "utm_zone_number": None,
+                    "semi_major_axis": None,
+                    "inverse_flattening": None,
+                    'spatial_ref':epsg_str,
+                    "_CoordinateTransformType": "Projection",
+                    "_CoordinateAxisTypes": "GeoX GeoY"}
+
+    # Assign the zone number
+    zone_str = meta.split('zone')[1]
+    map_meta['utm_zone_number'] = float((strip_chars(zone_str.split(',')[0])).strip()[-2:])
+
+    # Assign the semi_major_axis
+    axis_string = meta.split('spheroid')[1]
+    map_meta['semi_major_axis'] = float(axis_string.split(',')[1])
+
+    # Assing the flattening
+    map_meta["inverse_flattening"] = float(strip_chars(axis_string.split(',')[2]))
+
+    return map_meta
 
 def add_proj(nc_obj, epsg, nc_to_copy):
     """
@@ -24,7 +65,7 @@ def add_proj(nc_obj, epsg, nc_to_copy):
 
     # Adding coordinate system info to
     for name,var in nc_obj.variables.items():
-        out.respond(name)
+        #out.respond(name)
         # Assume all 2D+ vars are the same projection
         if 'x' in var.dimensions and 'y' in var.dimensions:
             nc_obj[name].setncatts({"grid_mapping":"projection"})
