@@ -55,8 +55,9 @@ def add_proj(nc_obj, epsg, nc_to_copy):
     try:
         map_meta = add_proj_from_web(epsg)
     except:
-        print("Failed to get projection info from the internet...\n"
-        "Using a local netcdf to determine the projection...")
+        if epsg is not None:
+            print("Failed to get projection info from the internet...\n"
+                  "Using a local netcdf to determine the projection...")
         map_meta = add_proj_from_file(nc_to_copy)
 
     # Create a variable called projection
@@ -95,7 +96,12 @@ s    """
     if os.path.isfile(nc_to_copy):
         nc_to_copy = Dataset(nc_to_copy)
 
-    map_meta = parse_wkt(nc_to_copy['transverse_mercator'].getncattr('spatial_ref'))
+    if 'transverse_mercator' in nc_to_copy.variables.keys():
+        map_meta = parse_wkt(nc_to_copy['transverse_mercator'].getncattr('spatial_ref'))
+    elif 'projection' in nc_to_copy.variables.keys():
+        map_meta = parse_wkt(nc_to_copy['projection'].getncattr('spatial_ref'))
+    else:
+        raise Exception('No projection information found in the nc_to_copy')
 
     return map_meta
 
