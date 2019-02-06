@@ -6,19 +6,6 @@ spatialnc
 .. image:: https://img.shields.io/pypi/v/spatialnc.svg
         :target: https://pypi.python.org/pypi/spatialnc
 
-.. image:: https://img.shields.io/travis/micahjohnson150/spatialnc.svg
-        :target: https://travis-ci.org/micahjohnson150/spatialnc
-
-.. image:: https://readthedocs.org/projects/spatialnc/badge/?version=latest
-        :target: https://spatialnc.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
-.. image:: https://pyup.io/repos/github/micahjohnson150/spatialnc/shield.svg
-     :target: https://pyup.io/repos/github/micahjohnson150/spatialnc/
-     :alt: Updates
-
-
 
 Python library for handling spatial data in netcdfs specifically for modeling using SMRF/AWSM
 
@@ -30,7 +17,9 @@ Python library for handling spatial data in netcdfs specifically for modeling us
 Features
 --------
 
-* TODO
+* IPW class - Python interface for opening files created by the Image Processing Workbench
+* Netcdf Manipulation - A topo class for managing non-time dependent data in netcdf form.
+* Netcdf Projections - Capable of adding UTM projection information to Netcdf so they can be read in by GDAL, QGIS, and other platforms
 
 Credits
 -------
