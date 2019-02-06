@@ -57,8 +57,6 @@ def add_proj(nc_obj, epsg, nc_to_copy=None):
         map_meta = add_proj_from_web(epsg)
     except:
         if nc_to_copy is not None:
-            print("Failed to get projection info from the internet...\n"
-                  "Using a local netcdf to determine the projection...")
             map_meta = add_proj_from_file(nc_to_copy)
         else:
             print("There appears to be an issue with the EPSG code or there is no internet.")
