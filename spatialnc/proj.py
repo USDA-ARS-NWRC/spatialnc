@@ -1,7 +1,7 @@
 import os
 from netCDF4 import Dataset
 from .utilities import strip_chars
-
+from urllib.request import urlopen
 
 def gather_utm_meta(epsg_str):
     """
@@ -40,7 +40,8 @@ def gather_utm_meta(epsg_str):
 
     return map_meta
 
-def add_proj(nc_obj, epsg, nc_to_copy):
+
+def add_proj(nc_obj, epsg, nc_to_copy=None):
     """
     Adds the projection using two different methods. One from an internet
     source using the epsg value and the other from an existing file containing
@@ -55,18 +56,21 @@ def add_proj(nc_obj, epsg, nc_to_copy):
     try:
         map_meta = add_proj_from_web(epsg)
     except:
-        if epsg is not None:
+        if nc_to_copy is not None:
             print("Failed to get projection info from the internet...\n"
                   "Using a local netcdf to determine the projection...")
-        map_meta = add_proj_from_file(nc_to_copy)
+            map_meta = add_proj_from_file(nc_to_copy)
+        else:
+            print("There appears to be an issue with the EPSG code or there is no internet.")
+            sys.exit()
 
     # Create a variable called projection
     nc_obj.createVariable("projection","S1")
     nc_obj["projection"].setncatts(map_meta)
 
     # Adding coordinate system info to
-    for name,var in nc_obj.variables.items():
-        #out.respond(name)
+    for name, var in nc_obj.variables.items():
+
         # Assume all 2D+ vars are the same projection
         if 'x' in var.dimensions and 'y' in var.dimensions:
             nc_obj[name].setncatts({"grid_mapping":"projection"})
@@ -92,14 +96,16 @@ def add_proj_from_file(nc_to_copy):
 
     Returns:
         map_meta: dictionary of attributes to add for spatial reference
-s    """
+    """
     if os.path.isfile(nc_to_copy):
         nc_to_copy = Dataset(nc_to_copy)
 
     if 'transverse_mercator' in nc_to_copy.variables.keys():
         map_meta = parse_wkt(nc_to_copy['transverse_mercator'].getncattr('spatial_ref'))
+
     elif 'projection' in nc_to_copy.variables.keys():
         map_meta = parse_wkt(nc_to_copy['projection'].getncattr('spatial_ref'))
+
     else:
         raise Exception('No projection information found in the nc_to_copy')
 
