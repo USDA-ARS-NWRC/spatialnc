@@ -1,5 +1,7 @@
 from netCDF4 import Dataset
 import os
+import numpy as np
+
 
 def strip_chars(edit_str, bad_chars='[(){}<>,"_]=\nns'):
     """
@@ -59,5 +61,55 @@ def copy_nc(infile, outfile, exclude=None):
                 # copy variable attributes all at once via dictionary
             dst[name].setncatts(src[name].__dict__)
 
+            #dst[name].missing_value = "NaN"
+    return dst
+
+
+def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
+    """
+    Masks a all the variables in a netcdf exlcuding, time, projection, x, y.
+    If output = none it will make the file named after the original filename
+
+    Args:
+        unmasked_file: Path to a netcdf dataset to that is to be masked
+        mask_file: Path to a netcdf dataset containing a variable named mask
+        output: filename to output the data
+        exlcude: variables to exclude
+
+    Returns:
+        dst: dataset object that the new masked dataset was written
+    """
+
+    #Parse the option name
+    if output is None:
+        # Isolate the name of the input file and use it for netcdf
+        out_fname = "masked_" + (os.path.split(unmasked_file)[-1]).split('.')[0] + '.nc'
+
+    else:
+        out_fname = output
+
+    unmasked = Dataset(unmasked_file)
+    mask_ds = Dataset(mask_file)
+    mask = mask_ds.variables['mask'][:]
+
+    mask = mask.astype(float)
+    mask[mask == 0] = np.nan
+    # Make a copy
+    dst = copy_nc(unmasked_file, out_fname)
+
+    for name, variable in unmasked.variables.items():
+        dims = variable.dimensions
+
+        if 'x' in dims and 'y' in dims:
+            if 'time' in dims:
+                # Mask all data in the time series
+                for i,t in enumerate(unmasked.variables['time'][:]):
+                    dst.variables[name][i,:] = unmasked.variables[name][i,:] * mask
+            else:
+                dst.variables[name][:] = unmasked.variables[name][:] * mask
+
+    # Close out
+    unmasked.close()
+    mask_ds.close()
 
     return dst
