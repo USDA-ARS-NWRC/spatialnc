@@ -3,6 +3,7 @@ from netCDF4 import Dataset
 from .utilities import strip_chars
 from urllib.request import urlopen
 
+
 def gather_utm_meta(epsg_str):
     """
     Use if the EPSG data is associated to UTM

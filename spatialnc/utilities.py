@@ -79,14 +79,13 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
     Returns:
         dst: dataset object that the new masked dataset was written
     """
+    # Isolate the name of the input file and use it for netcdf
+    out_fname = "masked_" + (os.path.split(unmasked_file)[-1]).split('.')[0] + \
+                '.nc'
 
-    #Parse the option name
-    if output is None:
-        # Isolate the name of the input file and use it for netcdf
-        out_fname = "masked_" + (os.path.split(unmasked_file)[-1]).split('.')[0] + '.nc'
-
-    else:
-        out_fname = output
+    # Parse the option name
+    if output is not None:
+        out_fname = os.path.join(output,out_fname)
 
     unmasked = Dataset(unmasked_file)
     mask_ds = Dataset(mask_file)
@@ -104,7 +103,8 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
             if 'time' in dims:
                 # Mask all data in the time series
                 for i,t in enumerate(unmasked.variables['time'][:]):
-                    dst.variables[name][i,:] = unmasked.variables[name][i,:] * mask
+                    dst.variables[name][i,:] = unmasked.variables[name][i,:] * \
+                                               mask
             else:
                 dst.variables[name][:] = unmasked.variables[name][:] * mask
 
