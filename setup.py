@@ -42,6 +42,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/micahjohnson150/spatialnc',
-    version='0.2.6',
+    version='version='0.2.6'',
     zip_safe=False,
 )
