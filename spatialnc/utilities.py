@@ -1,7 +1,7 @@
 from netCDF4 import Dataset
 import os
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 def strip_chars(edit_str, bad_chars='[(){}<>,"_]=\nns'):
     """
@@ -45,6 +45,7 @@ def copy_nc(infile, outfile, exclude=None):
 
     # copy global attributes all at once via dictionary
     dst.setncatts(src.__dict__)
+    dst.set_fill_on()
 
     # copy dimensions
     for name, dimension in src.dimensions.items():
@@ -54,14 +55,23 @@ def copy_nc(infile, outfile, exclude=None):
     # copy all file data except for the excluded
     for name, variable in src.variables.items():
         if name not in exclude:
-            dst.createVariable(name, variable.datatype, variable.dimensions)
+            dst.createVariable(name, variable.datatype, variable.dimensions,
+                                                        fill_value=np.nan)
 
             if name != 'projection':
                 dst[name][:] = src[name][:]
-                # copy variable attributes all at once via dictionary
-            dst[name].setncatts(src[name].__dict__)
 
-            #dst[name].missing_value = "NaN"
+            # copy variable attributes via dictionary and avoid overwriting any
+            incoming_dict = {}
+
+            for k,v in src[name].__dict__.items():
+
+                if k not in dst[name].__dict__.keys():
+                    if k not in ["_FillValue","fill_value"]:
+                        incoming_dict[k] = v
+
+            dst[name].setncatts(incoming_dict)
+
     return dst
 
 
@@ -85,7 +95,7 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
 
     # Parse the option name
     if output is not None:
-        out_fname = os.path.join(output,out_fname)
+        out_fname = os.path.join(output, out_fname)
 
     unmasked = Dataset(unmasked_file)
     mask_ds = Dataset(mask_file)
@@ -93,6 +103,7 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
 
     mask = mask.astype(float)
     mask[mask == 0] = np.nan
+
     # Make a copy
     dst = copy_nc(unmasked_file, out_fname)
 
@@ -107,6 +118,8 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
                                                mask
             else:
                 dst.variables[name][:] = unmasked.variables[name][:] * mask
+            # Set the
+            np.ma.set_fill_value(dst.variables[name][:], np.nan)
 
     # Close out
     unmasked.close()
