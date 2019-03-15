@@ -1,7 +1,6 @@
 from netCDF4 import Dataset
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 
 def strip_chars(edit_str, bad_chars='[(){}<>,"_]=\nns'):
     """
