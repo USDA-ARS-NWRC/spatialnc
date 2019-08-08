@@ -125,3 +125,11 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
     mask_ds.close()
 
     return dst
+
+def ipw2nc(ipw_f, nc_f):
+    """
+    Converts ipw to netcdf
+    """
+    ipw_ds = ipw.IPW(ipw_f)
+    for b, var in enumerate(m['name']):
+        em.variables[var][j, :] = i_em.bands[b].data
