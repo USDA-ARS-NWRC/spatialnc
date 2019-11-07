@@ -42,7 +42,7 @@ def gather_utm_meta(epsg_str):
     return map_meta
 
 
-def add_proj(nc_obj, epsg, nc_to_copy=None):
+def add_proj(nc_obj, epsg=None, nc_to_copy=None, map_meta=None):
     """
     Adds the projection using two different methods. One from an internet
     source using the epsg value and the other from an existing file containing
@@ -50,18 +50,21 @@ def add_proj(nc_obj, epsg, nc_to_copy=None):
     Args:
         nc_obj: netCDF4 dataset object needing the projection information
         nc_to_copy: netcdf obj or path that has desired projection information
-
+        espg: Look up an epsg value on the web if not none.
+        map_meta: Pass in a dictionary of the map meta data directly
     Returns:
         nc_obj: Original nc_bj plus the projection information
     """
-    try:
+    if epsg != None:
         map_meta = add_proj_from_web(epsg)
-    except:
-        if nc_to_copy is not None:
-            map_meta = add_proj_from_file(nc_to_copy)
-        else:
-            print("There appears to be an issue with the EPSG code or there is no internet.")
-            sys.exit()
+    elif nc_to_copy != None:
+        map_meta = add_proj_from_file(nc_to_copy)
+    elif map_meta != None:
+        pass
+    else:
+        raise IOError("A netcdf with projection information, or an EPSG code,"
+                      " or a dictionary of projection information must be"
+                      " passed.")
 
     # Create a variable called projection
     nc_obj.createVariable("projection","S1")
@@ -96,17 +99,27 @@ def add_proj_from_file(nc_to_copy):
     Returns:
         map_meta: dictionary of attributes to add for spatial reference
     """
+    # open a file otherwise assume its an object
     if os.path.isfile(nc_to_copy):
-        nc_to_copy = Dataset(nc_to_copy)
+        ds = Dataset(nc_to_copy)
+        path_passed = True
+    else:
+        nc_to_copy = ds
+        path_passed = False
 
-    if 'transverse_mercator' in nc_to_copy.variables.keys():
-        map_meta = parse_wkt(nc_to_copy['transverse_mercator'].getncattr('spatial_ref'))
+    # Sometimes the projection is called transverse_mercator
+    if 'transverse_mercator' in ds.variables.keys():
+        map_meta = parse_wkt(ds['transverse_mercator'].getncattr('spatial_ref'))
 
-    elif 'projection' in nc_to_copy.variables.keys():
-        map_meta = parse_wkt(nc_to_copy['projection'].getncattr('spatial_ref'))
+    elif 'projection' in ds.variables.keys():
+        map_meta = parse_wkt(ds['projection'].getncattr('spatial_ref'))
 
     else:
         raise Exception('No projection information found in the nc_to_copy')
+
+    # If a path was passed close it
+    if path_passed:
+        ds.close()
 
     return map_meta
 
