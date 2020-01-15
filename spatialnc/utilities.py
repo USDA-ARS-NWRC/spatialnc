@@ -46,6 +46,11 @@ def copy_nc(infile, outfile, exclude=None):
     dst.setncatts(src.__dict__)
     dst.set_fill_on()
 
+    for vname in exclude:
+        if vname not in src.variables:
+            raise ValueError("Attempting to exclude variable '{}' which is not "
+            "in {}.\n Available variables are: {}".format(vname, src.filepath(), ", ".join(src.variables)))
+
     # copy dimensions
     for name, dimension in src.dimensions.items():
         dst.createDimension(
@@ -53,9 +58,10 @@ def copy_nc(infile, outfile, exclude=None):
 
     # copy all file data except for the excluded
     for name, variable in src.variables.items():
+
         if name not in exclude:
-            dst.createVariable(name, variable.datatype, variable.dimensions,
-                                                        fill_value=np.nan)
+            dst.createVariable(name, variable.datatype, variable.dimensions)
+                                                        #fill_value=variable._grp[variable._varid])#.varid._FillValue)
 
             if name != 'projection':
                 dst[name][:] = src[name][:]
