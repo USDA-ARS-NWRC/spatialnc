@@ -41,36 +41,27 @@ class topo():
         """
         self.topoConfig = topoConfig
 
-        #logger.debug('Reading in topo info for AWSM')
         # read images
-        self.img_type = self.topoConfig['type']
-        if self.img_type == 'ipw':
-            self.readImages()
-        elif self.img_type == 'netcdf':
-            self.readNetCDF()
+        self.readNetCDF()
 
         # assign path to mask, write mask if needed
         # only needed if running iSnobal from ipw, not PySnobal
         if mask_isnobal and model_type == 'isnobal':
-            if self.img_type == 'netcdf':
-                # assign path
-                self.fp_mask = os.path.join(dir_m, 'run_mask.ipw')
-                # write mask ipw file
-                i_out = ipw.IPW()
-                i_out.new_band(self.mask)
-                i_out.add_geo_hdr([self.u, self.v], [self.du, self.dv],
-                                  self.units, csys)
-                i_out.write(self.fp_mask, 16)
+            # assign path
+            self.fp_mask = os.path.join(dir_m, 'run_mask.ipw')
+            # write mask ipw file
+            i_out = ipw.IPW()
+            i_out.new_band(self.mask)
+            i_out.add_geo_hdr([self.u, self.v], [self.du, self.dv],
+                              self.units, csys)
+            i_out.write(self.fp_mask, 16)
 
-            elif self.img_type == 'ipw':
-                self.fp_mask = self.topoConfig['mask']
         else:
             self.fp_mask = None
 
         # make masks one if not masking model
         if not mask_isnobal:
             self.mask = np.ones_like(self.dem)
-        #logger.debug('Done reading in topo info for AWSM')
 
     def readImages(self):
         """
@@ -102,11 +93,8 @@ class topo():
                 setattr(self, v, None)
 
         # set roughness if not given
-        if 'roughness' in self.topoConfig:
-            self.roughness = ipw.IPW(self.topoConfig['roughness']).bands[0].data.astype(np.float64)
-        else:
-            print('No surface roughness given in topo, setting to 5mm')
-            self.roughness = 0.005*np.ones((self.ny, self.nx))
+        print('No surface roughness given in topo, setting to 5mm')
+        self.roughness = 0.005 * np.ones((self.ny, self.nx))
 
         # create the x,y vectors
         self.x = self.v + self.dv*np.arange(self.nx)
@@ -194,7 +182,7 @@ def get_topo_stats(fp, filetype='netcdf'):
         ts['y'] = y
         ds.close()
 
-    if filetype == 'ipw':
+    elif filetype == 'ipw':
         i = ipw.IPW(fp)
         ts['nx'] = i.nsamps
         ts['ny'] = i.nlines
