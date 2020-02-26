@@ -1,7 +1,9 @@
-from . import ipw
-import numpy as np
 import os
+
+import numpy as np
 from netCDF4 import Dataset
+
+from . import ipw
 
 
 class topo():
@@ -97,8 +99,8 @@ class topo():
         self.roughness = 0.005 * np.ones((self.ny, self.nx))
 
         # create the x,y vectors
-        self.x = self.v + self.dv*np.arange(self.nx)
-        self.y = self.u + self.du*np.arange(self.ny)
+        self.x = self.v + self.dv * np.arange(self.nx)
+        self.y = self.u + self.du * np.arange(self.ny)
         [self.X, self.Y] = np.meshgrid(self.x, self.y)
 
     def readNetCDF(self):
@@ -127,13 +129,14 @@ class topo():
         # to double or int
         if 'roughness' not in f.variables.keys():
             print('No surface roughness given in topo, setting to 5mm')
-            self.roughness = 0.005*np.ones((self.ny, self.nx))
+            self.roughness = 0.005 * np.ones((self.ny, self.nx))
         else:
             self.roughness = f.variables['roughness'][:].astype(np.float64)
 
         for v_smrf in self.images:
 
-            # check to see if the user defined any variables e.g. veg_height = veg_length
+            # check to see if the user defined any variables e.g. veg_height =
+            # veg_length
             if v_smrf in self.topoConfig.keys():
                 v_file = self.topoConfig[v_smrf]
             else:
@@ -143,7 +146,6 @@ class topo():
                 result = f.variables[v_file][:].astype(np.float64)
 
             setattr(self, v_smrf, result)
-
 
         [self.X, self.Y] = np.meshgrid(self.x, self.y)
 
@@ -192,7 +194,7 @@ def get_topo_stats(fp, filetype='netcdf'):
         ts['v'] = float(i.bands[0].bsamp)
         ts['u'] = float(i.bands[0].bline)
         ts['csys'] = i.bands[0].coord_sys_ID
-        ts['x'] = ts['v'] + ts['dv']*np.arange(ts['nx'])
-        ts['y'] = ts['u'] + ts['du']*np.arange(ts['ny'])
+        ts['x'] = ts['v'] + ts['dv'] * np.arange(ts['nx'])
+        ts['y'] = ts['u'] + ts['du'] * np.arange(ts['ny'])
 
     return ts

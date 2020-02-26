@@ -1,6 +1,8 @@
-from netCDF4 import Dataset
 import os
+
 import numpy as np
+from netCDF4 import Dataset
+
 
 def strip_chars(edit_str, bad_chars='[(){}<>,"_]=\nns'):
     """
@@ -31,13 +33,13 @@ def copy_nc(infile, outfile, exclude=None):
     Returns the output netcdf dataset object for modifying
     """
 
-    if type(exclude) != list:
+    if not isinstance(exclude, list):
         exclude = [exclude]
 
     dst = Dataset(outfile, "w")
 
     # Allow for either object or filename to be passed
-    if type(infile) == str:
+    if isinstance(infile, str):
         src = Dataset(infile)
     else:
         src = infile
@@ -49,7 +51,7 @@ def copy_nc(infile, outfile, exclude=None):
     for vname in exclude:
         if vname not in src.variables:
             raise ValueError("Attempting to exclude variable '{}' which is not "
-            "in {}.\n Available variables are: {}".format(vname, src.filepath(), ", ".join(src.variables)))
+                             "in {}.\n Available variables are: {}".format(vname, src.filepath(), ", ".join(src.variables)))
 
     # copy dimensions
     for name, dimension in src.dimensions.items():
@@ -61,7 +63,7 @@ def copy_nc(infile, outfile, exclude=None):
 
         if name not in exclude:
             dst.createVariable(name, variable.datatype, variable.dimensions)
-                                                        #fill_value=variable._grp[variable._varid])#.varid._FillValue)
+            # fill_value=variable._grp[variable._varid])#.varid._FillValue)
 
             if name != 'projection':
                 dst[name][:] = src[name][:]
@@ -69,10 +71,10 @@ def copy_nc(infile, outfile, exclude=None):
             # copy variable attributes via dictionary and avoid overwriting any
             incoming_dict = {}
 
-            for k,v in src[name].__dict__.items():
+            for k, v in src[name].__dict__.items():
 
                 if k not in dst[name].__dict__.keys():
-                    if k not in ["_FillValue","fill_value"]:
+                    if k not in ["_FillValue", "fill_value"]:
                         incoming_dict[k] = v
 
             dst[name].setncatts(incoming_dict)
@@ -118,9 +120,9 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
         if 'x' in dims and 'y' in dims:
             if 'time' in dims:
                 # Mask all data in the time series
-                for i,t in enumerate(unmasked.variables['time'][:]):
-                    dst.variables[name][i,:] = unmasked.variables[name][i,:] * \
-                                               mask
+                for i, t in enumerate(unmasked.variables['time'][:]):
+                    dst.variables[name][i, :] = unmasked.variables[name][i, :] * \
+                        mask
             else:
                 dst.variables[name][:] = unmasked.variables[name][:] * mask
             # Set the
@@ -131,6 +133,7 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
     mask_ds.close()
 
     return dst
+
 
 def ipw2nc(ipw_f, nc_f):
     """

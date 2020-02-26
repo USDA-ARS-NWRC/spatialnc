@@ -6,12 +6,12 @@ Adapted from Roger Lew (rogerlew.gmail.com)isnobal.py
 @author: Scott Havens
 """
 
-from glob import glob
 import os
 import sys
-import numpy as np
+from glob import glob
 from math import ceil
 
+import numpy as np
 
 in_db__vars = tuple('I_lw T_a e_a u T_g S_n'.split())
 out_em__vars = tuple('R_n H L_v_E G M delta_Q E_s '
@@ -68,6 +68,7 @@ class Band:
     """
     Represents a raster band of geospatial data
     """
+
     def __init__(self, nlines, nsamps):
 
         # Using classes instead of dicts makes things faster
@@ -120,8 +121,8 @@ class Band:
                              dsamp, 0.0,
                              bline - dline / 2.0,
                              0.0, dline]
-        self.y = bline + np.arange(self.nlines)*dline
-        self.x = bsamp + np.arange(self.nsamps)*dsamp
+        self.y = bline + np.arange(self.nlines) * dline
+        self.x = bsamp + np.arange(self.nsamps) * dsamp
 
     def _parse_geo(self, L0, L1, L2, L3, L4, L5):
         """
@@ -166,6 +167,7 @@ class IPW:
     """
     Represents a IPW file container
     """
+
     def __init__(self, fname=None, epsg=32611):
         """
         IPW(fname[, rescale=True])
@@ -243,7 +245,7 @@ class IPW:
 
         # size of the file we are reading in bytes
         st_size = os.fstat(fid.fileno()).st_size
-        while 1:  # while 1 is faster than while True
+        while True:  # while 1 is faster than while True
             line = _decode(readline())
 
             # fail safe, haven't needed it, but if this is running
@@ -264,7 +266,7 @@ class IPW:
                 indx = _unpackindx(line)    # band number
                 bytes = bands[indx].bytes = _unpackint(readline())
 #                 bands[indx].frmt = ('uint8', 'uint16')[bytes == 2]
-                bands[indx].frmt = 'uint' + str(bytes*8)
+                bands[indx].frmt = 'uint' + str(bytes * 8)
                 bands[indx].bits = _unpackint(readline())
 
                 # see if there is any other information
@@ -346,7 +348,7 @@ class IPW:
         # this is way faster than looping with struct.unpack
         # struct.unpack also starts assuming there are pad bytes
         # when format strings with different types are supplied
-        data = np.fromfile(fid, dt, count=nlines*nsamps)
+        data = np.fromfile(fid, dt, count=nlines * nsamps)
 
         # Separate into bands
         data = data.reshape(nlines, nsamps)
@@ -391,7 +393,7 @@ class IPW:
 
         # size of the file we are reading in bytes
         st_size = os.fstat(fid.fileno()).st_size
-        while 1:  # while 1 is faster than while True
+        while True:  # while 1 is faster than while True
             line = readline3(fid)
 
             # fail safe, haven't needed it, but if this is running
@@ -413,7 +415,7 @@ class IPW:
                 indx = _unpackindx(line)    # band number
                 bytes = bands[indx].bytes = _unpackint(readline3(fid))
 #                 bands[indx].frmt = ('uint8', 'uint16')[bytes == 2]
-                bands[indx].frmt = 'uint' + str(bytes*8)
+                bands[indx].frmt = 'uint' + str(bytes * 8)
                 bands[indx].bits = _unpackint(readline3(fid))
 
                 # see if there is any other information
@@ -495,7 +497,7 @@ class IPW:
         # this is way faster than looping with struct.unpack
         # struct.unpack also starts assuming there are pad bytes
         # when format strings with different types are supplied
-        data = np.fromfile(fid, dt, count=nlines*nsamps)
+        data = np.fromfile(fid, dt, count=nlines * nsamps)
 
         # Separate into bands
         data = data.reshape(nlines, nsamps)
@@ -535,8 +537,8 @@ class IPW:
         for i, b in enumerate(self.bands):
             self.bands[i].name = 'band%02i' % i
             self.bands[i].bits = nbits
-            bytes = self.bands[i].bytes = int(ceil(float(nbits)/8))
-            self.bands[i].frmt = 'uint' + str(bytes*8)
+            bytes = self.bands[i].bytes = int(ceil(float(nbits) / 8))
+            self.bands[i].frmt = 'uint' + str(bytes * 8)
             self.bands[i].int_min = 0
             self.bands[i].int_max = 2**nbits - 1
             float_max = np.amax(self.bands[i].data)
@@ -716,7 +718,7 @@ class IPW:
         """
         Convert bits to equiavalent bytes
         """
-        return int(ceil(float(nbits)/8))
+        return int(ceil(float(nbits) / 8))
 
     def __getitem__(self, key):
         return self.bands[self.name_dict[key]]
@@ -791,7 +793,7 @@ class IPW:
 
         if band == 'all':
             band = range(0, self.nbands)     # all bands
-        elif type(band) == int:
+        elif isinstance(band, int):
             band = [band]                   # single band
 
         # loop through each band and add the header
@@ -837,6 +839,7 @@ nbands: {0.nbands}
 
         return ''.join(s)
 
+
 def int_match(val):
     """
     (Devel team is unsure if this is the case. This description is our
@@ -856,8 +859,6 @@ def int_match(val):
     """
     int_val = int(val)
     return int_val if val == int_val else val
-
-
 
 
 def _packgrp(root, grp, wc, varlist, nbands=None):
