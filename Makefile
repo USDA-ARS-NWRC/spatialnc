@@ -51,8 +51,8 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## clean up style
-	isort spatialnc/*.py tests/*.py
-	autopep8 --aggressive --in-place spatialnc/*.py tests/*.py
+	isort spatialnc/*.py tests/*.py scripts/*
+	autopep8 --aggressive --in-place spatialnc/*.py tests/*.py scripts/*
 
 test: ## run tests quickly with the default Python
 	py.test
