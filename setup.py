@@ -34,7 +34,10 @@ setup(
     license="MIT license",
     long_description=readme + '\n\n' + history,
     include_package_data=True,
-    scripts=['./scripts/make_projected_nc', './scripts/nc_stats'],
+    entry_points={
+        'console_scripts': [
+            'nc_stats=spatialnc.cli:nc_stats',
+            'make_projected_nc=spatialnc.cli:make_projected_nc']},
     keywords='spatialnc',
     name='spatialnc',
     packages=find_packages(include=['spatialnc']),

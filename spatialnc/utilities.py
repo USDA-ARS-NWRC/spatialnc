@@ -2,7 +2,29 @@ import os
 
 import numpy as np
 from netCDF4 import Dataset
+import logging
+import coloredlogs
 
+def get_logger(name, level='debug', log_file='log.txt'):
+    """
+    Retrieve the logger for SWIFLow with coloredlogs installed in the
+    right format
+    """
+    # Setup logging
+    log_level = level.upper()
+    level = logging.getLevelName(log_level)
+
+    # Add a custom format for logging
+    fmt = "%(levelname)s: %(msg)s"
+
+    # Always write log file to <output>/log.txt
+    log = logging.getLogger(name)
+
+    # Log to file, no screen output.
+    logging.basicConfig(filename=log_file, filemode='w+',
+                        level=log_level,
+                        format=fmt)
+    return log
 
 def strip_chars(edit_str, bad_chars='[(){}<>,"_]=\nns'):
     """
