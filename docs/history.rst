@@ -14,7 +14,7 @@ History
 * Added IPW class from SMRF
 * Added topo class from awsm
 
-0.3.0 (TBD)
+0.3.0 (2020-04-02)
 ------------------
 
 * Added projection retrieval from netcdf
@@ -22,7 +22,13 @@ History
 * Readability improvements
 * Added in nc_stats cli tool
 * Added in linting with isort and autopep8
-* Fixes for issues: 1_, 6_ 
+* Fixes for issues: 1_, 2_, 3_, 6_ 
 
 .. _1: https://github.com/USDA-ARS-NWRC/spatialnc/issues/1
+.. _2: https://github.com/USDA-ARS-NWRC/spatialnc/issues/2
+.. _3: https://github.com/USDA-ARS-NWRC/spatialnc/issues/3
 .. _6: https://github.com/USDA-ARS-NWRC/spatialnc/issues/6
+
+
+0.4.0 (TBD)
+------------------
