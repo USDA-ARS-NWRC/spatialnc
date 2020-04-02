@@ -14,6 +14,7 @@ from netCDF4 import Dataset
 from . import __version__
 from .analysis import get_stats
 from .utilities import get_logger
+from .proj import add_proj
 
 
 def nc_stats():
@@ -171,4 +172,52 @@ def nc_stats():
 
 
 def make_projected_nc():
-    pass
+    '''
+    CLI entrypoint for adding projections information to a netcdf that
+    doesnt have it already
+
+    Add projection information to netcdf file. This will add it to existing
+    file old_nc
+    '''
+
+    # Parse arguments
+    p = argparse.ArgumentParser(
+        description='Add projection info to NetCDF file')
+
+    p.add_argument('old_nc', metavar='o', type=str,
+                   help='Path to original netcdf with no projection')
+
+    p.add_argument('-pnc', '--projected_nc', required=True,
+                   help="Path to netcdf that has projection information")
+
+    args = p.parse_args()
+
+    old_nc = os.path.abspath(args.old_nc)
+    projected_nc = os.path.abspath(args.projected_nc)
+
+    s = Dataset(old_nc, 'a')
+
+    # if we have projection info, do not need to add it
+    if 'projection' in s.variables.keys():
+        raise IOError('{} already has projection information'.format(old_nc))
+
+    # give the user a choice
+    else:
+        y_n = 'a'  # set a funny value to y_n
+        # while it is not y or n (for yes or no)
+        while y_n not in ['y', 'n']:
+            y_n = input('The script make_projected_nc will modify the file '
+                        '{} by adding projection information. Would you like to '
+                        'proceed? (y n): '.format(old_nc))
+
+            # if they say yes, add it
+            if y_n.lower() == 'y':
+                s = add_proj(s, None, projected_nc)
+                s.sync()
+            elif y_n.lower() == 'n':
+                print('Exiting')
+            else:
+                raise IOError('Did not answer "y" or "n"')
+
+    # close nc file
+    s.close()
