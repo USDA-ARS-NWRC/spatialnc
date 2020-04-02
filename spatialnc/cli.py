@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from netCDF4 import Dataset
+import argparse
+import sys
+import time
+from collections import OrderedDict
+from os.path import abspath, expanduser, isdir, isfile
+
 import numpy as np
 import progressbar as pb
-import argparse
-from collections import OrderedDict
-import sys
-from os.path import isfile, isdir, abspath, expanduser
-import time
+from netCDF4 import Dataset
 
 from . import __version__
 from .analysis import get_stats
@@ -17,53 +18,157 @@ from .utilities import get_logger
 
 def nc_stats():
 
-    parser = argparse.ArgumentParser(description='Calculate Statistics on NetCDF Files.')
+    parser = argparse.ArgumentParser(
+        description='Calculate Statistics on NetCDF Files.')
 
     parser.add_argument('filename', metavar='f', type=str,
                         help='Path of a netcdf file (File Extension = .nc).')
 
-    parser.add_argument('variable', metavar='v', type=str,
-                        help='Name of the variable in the netcdf file to process.')
+    parser.add_argument('-v', '--variables', dest='variables', type=str, nargs='+',
+                        help='Name of the variable(s) in the netcdf file to process.')
 
-    parser.add_argument('-t', dest='time', help="Isolates a timestep from file", default = 'all')
-    parser.add_argument('-x', dest='x', help="Specify an x coordinate to run statistics on ", default = 'all')
-    parser.add_argument('-y', dest='y', help="Specify an y coordinate to run statistics on ", default = 'all')
+    # parser.add_argument('-t', dest='time', help="Isolates a timestep from file", default = 'all')
+    # parser.add_argument('-x', dest='x', help="Specify an x coordinate to run statistics on ", default = 'all')
+    # parser.add_argument('-y', dest='y', help="Specify an y coordinate to run statistics on ", default = 'all')
+
+    parser.add_argument(
+        '-idt',
+        dest='index_time',
+        type=int,
+        nargs='+',
+        help="Specify a time index from file")
+    parser.add_argument(
+        '-idy',
+        dest='index_y',
+        type=int,
+        nargs='+',
+        help="Specify an y index to run statistics on ")
+    parser.add_argument(
+        '-idx',
+        dest='index_x',
+        type=int,
+        nargs='+',
+        help="Specify an x index to run statistics on ")
+    parser.add_argument('-s', dest='statistics', type=str, nargs='+',
+                        choices=['max', 'min', 'mean', 'std'],
+                        default=['max', 'min', 'mean', 'std'],
+                        help="Specify an x index to run statistics on ")
 
     args = parser.parse_args()
 
     filename = abspath(expanduser(args.filename))
 
-    log = get_logger(__name__,log_file=None)
-
     # Open data set
     ds = Dataset(filename, 'r')
 
-    # Check the users inpurts
-    variable = args.variable
+    if args.variables is None:
+        variables = [
+            name for name,
+            v in ds.variables.items() if name not in [
+                'time',
+                'x',
+                'y',
+                'projection']]
 
     # track how long this takes.
     start = time.time()
 
-    log.info("\n=========== NC_STATS v{} ==========".format(__version__))
-    log.info("\nProcessing netCDF statistics...")
-    log.info("\tFilename: {0}".format(filename))
-    log.info("\tvariable: {0}".format(variable))
+    print("\n=========== NC_STATS v{} ==========".format(__version__))
+    print("\nProcessing netCDF statistics...")
+    print("Filename: {0}".format(filename))
 
-    # Filter the data here according to users
-    data = ds.variables[variable][:]
-    log.info("\tVariable Shape: {0}".format(" X".join([str(s) for s in data.shape])))
+    # Check user inputs are valid
+    dimensions = []
 
-    stats = get_stats(data)
+    # Is the user requesting a slice?
+    user_slicing = False
+
+    for dim in ['time', 'y', 'x']:
+        dim_input = getattr(args, 'index_{}'.format(dim))
+        dim_range = []
+        # Is it a valid dimension name?
+        if dim not in ds.variables and dim_input is not None:
+            print('\nError: {} is not a valid dimension in this dataset! '
+                  'Available dimensions are: {}\n'
+                  ''.format(dim, ', '.join(ds.dimensions.keys())))
+            sys.exit()
+
+        if dim in ds.variables.keys():
+            # Was not provided
+            dimension_shape = ds.variables[dim][:].shape[0]
+
+            if dim_input is None:
+                dim_range = [0, dimension_shape]
+
+            # Was a dimension index provided?
+            else:
+                user_slicing = True
+                # Check the values actually provided
+                for v in dim_input:
+                    # is it in the index of the dataset
+                    if v in range(0, dimension_shape):
+                        dim_range.append(v)
+                    else:
+                        print('Error: Index of {} out of range for {}'
+                              'dimension!\n'.format(dim, v))
+                        sys.exit()
+
+                # Is the user asking for a single point?
+                if len(dim_range) == 1:
+                    dim_range.append(dim_range[0] + 1)
+
+            # Append the dimensions to our list and make them a slice
+            dimensions.append(slice(*dim_range))
+
+    # Check the dimensionality and put them into a tuple
+    ND = len(dimensions)
+
+    if ND == 3:
+        slices = dimensions[0], dimensions[1], dimensions[2]
+
+    elif ND == 2:
+        slices = dimensions[0], dimensions[1]
+
+    elif ND == 1:
+        slices = (dimensions[0])
+    else:
+        print('ERROR: nc_stats is unable to handle {} dimensional data.\n'.format(ND))
+        sys.exit()
+
+    # Loop through all variables and print out results
+    for v in variables:
+        print('')
+        if v not in ds.variables.keys():
+            print('{} is not in the dataset, skipping...'.format(v))
+
+        else:
+            msg_str = " " * 3 + "{} statistics".format(v) + " " * 3
+            print("=" * len(msg_str))
+            print(msg_str)
+            print("=" * len(msg_str))
+            data = ds.variables[v][slices]
+
+            print("  Data Dimensions: {0}"
+                  "".format(" X ".join([str(s) for s in ds.variables[v].shape])))
+
+            if user_slicing:
+                print("  Filtered Dimensions: {0}"
+                      "".format(" X ".join([str(s) for s in data.shape])))
+                print('  Using indicies [{}]'.format(
+                    ", ".join(["{}:{}".format(s.start, s.stop) for s in slices])))
+
+            print('')
+
+            # Get the statistics
+            stats = get_stats(data, np_stats=args.statistics)
+
+            # Output to screen
+            for stat, value in stats.items():
+                print("  {0} = {1:0.4f}".format(stat.upper(), value))
+
     ds.close()
-    msg_str =  " "*3 + "{} statistics".format(variable) + " "*3
-    log.info('')
-    log.info("="*len(msg_str))
-    log.info(msg_str)
-    log.info("="*len(msg_str))
+    print('\nComplete! Elapsed {:d}s'.format(int(time.time() - start)))
 
-    #Output to screen
-    for stat, value in stats.items():
-        log.info("{0} = {1:0.4f}".format(stat, value))
-    log.info('\nComplete! Elapsed {:d}s'.format(int(time.time() - start) ))
+
 def make_projected_nc():
     pass

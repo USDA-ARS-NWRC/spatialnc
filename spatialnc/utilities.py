@@ -1,9 +1,10 @@
+import logging
 import os
 
+import coloredlogs
 import numpy as np
 from netCDF4 import Dataset
-import logging
-import coloredlogs
+
 
 def get_logger(name, level='debug', log_file='log.txt'):
     """
@@ -25,6 +26,7 @@ def get_logger(name, level='debug', log_file='log.txt'):
                         level=log_level,
                         format=fmt)
     return log
+
 
 def strip_chars(edit_str, bad_chars='[(){}<>,"_]=\nns'):
     """

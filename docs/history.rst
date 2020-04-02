@@ -20,7 +20,9 @@ History
 * Added projection retrieval from netcdf
 * Added in a netcdf copying and masking function
 * Readability improvements
+* Added in nc_stats cli tool
 * Added in linting with isort and autopep8
-* Fixes for issues: 1_ 
+* Fixes for issues: 1_, 6_ 
 
 .. _1: https://github.com/USDA-ARS-NWRC/spatialnc/issues/1
+.. _6: https://github.com/USDA-ARS-NWRC/spatialnc/issues/6
