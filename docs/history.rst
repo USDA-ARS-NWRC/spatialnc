@@ -32,3 +32,8 @@ History
 
 0.4.0 (TBD)
 ------------------
+
+* Fixes for 7_, 8_
+
+.. _7: https://github.com/USDA-ARS-NWRC/spatialnc/issues/7
+.. _8: https://github.com/USDA-ARS-NWRC/spatialnc/issues/8
