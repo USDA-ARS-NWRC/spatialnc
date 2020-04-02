@@ -28,9 +28,9 @@ def nc_stats():
     parser.add_argument('-v', '--variables', dest='variables', type=str, nargs='+',
                         help='Name of the variable(s) in the netcdf file to process.')
 
-    # parser.add_argument('-t', dest='time', help="Isolates a timestep from file", default = 'all')
-    # parser.add_argument('-x', dest='x', help="Specify an x coordinate to run statistics on ", default = 'all')
-    # parser.add_argument('-y', dest='y', help="Specify an y coordinate to run statistics on ", default = 'all')
+    parser.add_argument('-p', '--precision', dest='precision', type=int,
+                        default=4,
+                        help='Number of decimals to show in the results.')
 
     parser.add_argument(
         '-idt',
@@ -38,18 +38,21 @@ def nc_stats():
         type=int,
         nargs='+',
         help="Specify a time index from file")
+
     parser.add_argument(
         '-idy',
         dest='index_y',
         type=int,
         nargs='+',
         help="Specify an y index to run statistics on ")
+
     parser.add_argument(
         '-idx',
         dest='index_x',
         type=int,
         nargs='+',
         help="Specify an x index to run statistics on ")
+
     parser.add_argument('-s', dest='statistics', type=str, nargs='+',
                         choices=['max', 'min', 'mean', 'std'],
                         default=['max', 'min', 'mean', 'std'],
@@ -87,6 +90,7 @@ def nc_stats():
     for dim in ['time', 'y', 'x']:
         dim_input = getattr(args, 'index_{}'.format(dim))
         dim_range = []
+
         # Is it a valid dimension name?
         if dim not in ds.variables and dim_input is not None:
             print('\nError: {} is not a valid dimension in this dataset! '
@@ -164,8 +168,11 @@ def nc_stats():
             stats = get_stats(data, np_stats=args.statistics)
 
             # Output to screen
+            interior = "1:0.{}f".format(args.precision)
+            msg = '   {0} = ' + '{' + interior + '}'
+
             for stat, value in stats.items():
-                print("  {0} = {1:0.4f}".format(stat.upper(), value))
+                print(msg.format(stat.upper(), value))
 
     ds.close()
     print('\nComplete! Elapsed {:d}s'.format(int(time.time() - start)))
