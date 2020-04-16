@@ -65,6 +65,7 @@ def nc_stats():
     # Open data set
     ds = Dataset(filename, 'r')
 
+    variables = args.variables
     if args.variables is None:
         variables = [
             name for name,

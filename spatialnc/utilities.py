@@ -57,8 +57,11 @@ def copy_nc(infile, outfile, exclude=None):
     Returns the output netcdf dataset object for modifying
     """
 
-    if not isinstance(exclude, list):
-        exclude = [exclude]
+    if exclude is not None:
+        if not isinstance(exclude, list):
+            exclude = [exclude]
+    else:
+        exclude = []
 
     dst = Dataset(outfile, "w")
 
@@ -72,10 +75,13 @@ def copy_nc(infile, outfile, exclude=None):
     dst.setncatts(src.__dict__)
     dst.set_fill_on()
 
-    for vname in exclude:
-        if vname not in src.variables:
-            raise ValueError("Attempting to exclude variable '{}' which is not "
-                             "in {}.\n Available variables are: {}".format(vname, src.filepath(), ", ".join(src.variables)))
+    if exclude is not None:
+        for vname in exclude:
+            if vname not in src.variables:
+                raise ValueError("Attempting to exclude variable '{}' "
+                                 "which is not in {}.\n Available variables "
+                                 "are: {}".format(vname, src.filepath(),
+                                                  ", ".join(src.variables)))
 
     # copy dimensions
     for name, dimension in src.dimensions.items():
