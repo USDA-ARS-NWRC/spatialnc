@@ -1,7 +1,5 @@
 from collections import OrderedDict
 
-from .utilities import get_logger
-
 
 def get_stats(data, np_stats=['max', 'min', 'mean', 'std']):
     '''
@@ -12,7 +10,8 @@ def get_stats(data, np_stats=['max', 'min', 'mean', 'std']):
         data: Numpy array of any size/dimension
         np_stats: Statistic name to use, must be an function of a numpy array
     Returns:
-        dictionary: dict of the stats names as keys and values associated with np_stats
+        dictionary: dict of the stats names as keys and values associated
+            with np_stats
     '''
 
     # put together the operations to use

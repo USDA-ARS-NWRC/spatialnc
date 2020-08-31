@@ -1,7 +1,6 @@
 import logging
 import os
 
-import coloredlogs
 import numpy as np
 from netCDF4 import Dataset
 
@@ -127,8 +126,8 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
         dst: dataset object that the new masked dataset was written
     """
     # Isolate the name of the input file and use it for netcdf
-    out_fname = "masked_" + (os.path.split(unmasked_file)[-1]).split('.')[0] + \
-                '.nc'
+    out_fname = 'masked_{}.nc'.format(
+        (os.path.split(unmasked_file)[-1]).split('.')[0])
 
     # Parse the option name
     if output is not None:
@@ -151,8 +150,7 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
             if 'time' in dims:
                 # Mask all data in the time series
                 for i, t in enumerate(unmasked.variables['time'][:]):
-                    dst.variables[name][i, :] = unmasked.variables[name][i, :] * \
-                        mask
+                    dst.variables[name][i, :] = unmasked.variables[name][i, :] * mask  # noqa
             else:
                 dst.variables[name][:] = unmasked.variables[name][:] * mask
             # Set the
@@ -165,10 +163,10 @@ def mask_nc(unmasked_file, mask_file, output=None, exclude=[]):
     return dst
 
 
-def ipw2nc(ipw_f, nc_f):
-    """
-    Converts ipw to netcdf
-    """
-    ipw_ds = ipw.IPW(ipw_f)
-    for b, var in enumerate(m['name']):
-        em.variables[var][j, :] = i_em.bands[b].data
+# def ipw2nc(ipw_f, nc_f):
+#     """
+#     Converts ipw to netcdf
+#     """
+#     ipw_ds = ipw.IPW(ipw_f)
+#     for b, var in enumerate(m['name']):
+#         em.variables[var][j, :] = i_em.bands[b].data

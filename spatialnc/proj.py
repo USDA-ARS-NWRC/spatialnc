@@ -88,15 +88,15 @@ def add_proj(nc_obj, epsg=None, nc_to_copy=None, map_meta=None):
                                     "".format(name.lower())})
 
             # Set the units
-            nc_obj[name].setncatts({"units": "meters".format(name.lower())})
+            nc_obj[name].setncatts({"units": "meters"})
 
     return nc_obj
 
 
 def add_proj_from_file(nc_to_copy):
     """
-    Use a netcdf file converted from a tif using gdal to retrieve the projection
-    information
+    Use a netcdf file converted from a tif using gdal to retrieve the
+    projection information
 
     Args:
         nc_to_copy: netcdf obj or path that has desired projection information
@@ -148,7 +148,7 @@ def add_proj_from_web(epsg):
             "http://spatialreference.org/ref/epsg/{0}/prettywkt/".format(epsg))
     except BaseException:
         wkt = urlopen(
-            "http://spatialreference.org/ref/sr-org/{0}/prettywkt/".format(epsg))
+            "http://spatialreference.org/ref/sr-org/{0}/prettywkt/".format(epsg))  # noqa
 
     # remove spaces between charachters
     remove_spaces = ((wkt.read()).decode('utf-8')).replace(" ", "")
@@ -170,7 +170,7 @@ def parse_wkt(epsg_string):
         map_meta: dictionary of projection data to be added to the netcdf
     """
     map_meta = {}
-    wkt_data = (epsg_string.lower()).split(',')
+    # wkt_data = (epsg_string.lower()).split(',')
 
     # Add more projection parsers here
     if 'utm' in epsg_string.lower():

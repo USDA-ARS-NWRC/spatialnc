@@ -110,8 +110,9 @@ class topo():
         """
 
         if 'filename' not in self.topoConfig:
-            raise ValueError('''Filename was not specified in topo.
-                            Please provide a netcdf filename in config file.''')
+            raise ValueError(
+                '''Filename was not specified in topo.
+                   Please provide a netcdf filename in config file.''')
 
         # read in the images
         f = Dataset(self.topoConfig['filename'], 'r')

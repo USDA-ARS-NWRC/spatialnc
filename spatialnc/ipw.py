@@ -557,21 +557,21 @@ class IPW:
         with open(fileName, 'w') as f:
 
             # write the global variables
-            for l in self._write_basic_image_i():
-                f.write(l + '\n')
+            for line in self._write_basic_image_i():
+                f.write(line + '\n')
 
             # write any basic_image headers
-            for l in self._write_basic_image():
-                f.write(l + '\n')
+            for line in self._write_basic_image():
+                f.write(line + '\n')
 
             # write the geo headers, if there
             if self.geohdr is not None:
-                for l in self._write_geo_hdr():
-                    f.write(l + '\n')
+                for line in self._write_geo_hdr():
+                    f.write(line + '\n')
 
             # write the linear quantization (lq) headers
-            for l in self._write_lq_hdr():
-                f.write(l + '\n')
+            for line in self._write_lq_hdr():
+                f.write(line + '\n')
 
             # if other headers are required, then put them here
 
@@ -633,8 +633,8 @@ class IPW:
                 lines += ['annot = {0} '.format(band.annot)]
 
             if band.history:
-                for l in band.history:
-                    lines += ["history = {0} ".format(l)]
+                for line in band.history:
+                    lines += ["history = {0} ".format(line)]
 
         return lines
 
@@ -781,7 +781,8 @@ class IPW:
         self.coord_sys_ID = None
         self.geotransform = None
 
-         mkgeoh -o coord,coord -d incr,incr -u units -c csys [-b band,...] [-f] [image]
+         mkgeoh -o coord,coord -d incr,incr -u units -c csys
+            [-b band,...] [-f] [image]
         """
 
         # Check the inputs
