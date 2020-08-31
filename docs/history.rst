@@ -30,11 +30,11 @@ History
 .. _6: https://github.com/USDA-ARS-NWRC/spatialnc/issues/6
 
 
-0.4.0 (TBD)
+0.4.0 (2020-08-31)
 ------------------
 
 * updated Travis testing
-* setuptools_scm for versioning and deployment
+* setuptools_scm for versioning and automated deployment
 * Fixes for 7_, 8_, 9_
 
 .. _7: https://github.com/USDA-ARS-NWRC/spatialnc/issues/7
