@@ -9,7 +9,8 @@ import os
 class TestUtilities(unittest.TestCase):
     @classmethod
     def setUp(self):
-        topo_f = abspath(join(spnc.__file__,'..','..','tests','data','topo.nc'))
+        topo_f = abspath(join(spnc.__file__, '..', '..',
+                              'tests', 'data', 'topo.nc'))
         self.topo = Dataset(topo_f)
 
     @classmethod
@@ -31,7 +32,7 @@ class TestUtilities(unittest.TestCase):
         d = copy_nc(self.topo, 'test.nc', exclude=ex_var)
 
         if keep is not None:
-            self.assertTrue(len(keep)==len(d.variables.keys()))
+            self.assertTrue(len(keep) == len(d.variables.keys()))
             for v in keep:
                 self.assertTrue(v in d.variables.keys())
 
@@ -46,7 +47,7 @@ class TestUtilities(unittest.TestCase):
         '''
         Test whether we can copy a netcdf
         '''
-        keep = ['x','y','projection']
+        keep = ['x', 'y', 'projection']
         self.check_copy_nc(keep=keep)
 
     def test_copy_nc_wo_exclude(self):
