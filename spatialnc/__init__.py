@@ -2,6 +2,9 @@
 
 """Top-level package for spatialnc."""
 
-__author__ = """Micah Johnson"""
-__email__ = 'micah.johnson150@gmail.com'
-__version__ = '0.3.2'
+from pkg_resources import DistributionNotFound, get_distribution
+
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    __version__ = 'unknown'

@@ -33,6 +33,8 @@ History
 0.4.0 (TBD)
 ------------------
 
+* updated Travis testing
+* setuptools_scm for versioning and deployment
 * Fixes for 7_, 8_, 9_
 
 .. _7: https://github.com/USDA-ARS-NWRC/spatialnc/issues/7

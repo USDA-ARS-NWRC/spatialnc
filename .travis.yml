@@ -24,12 +24,14 @@ addons:
 # following command to finish PyPI deployment setup:
 # $ travis encrypt --add deploy.password
 deploy:
+  cleanup: true
   provider: pypi
   distributions: sdist bdist_wheel
-  user: micahjohnson150
-  password:
-    secure: PLEASE_REPLACE_ME
+  skip_existing: true
+  username: __token__
   on:
     tags: true
-    repo: micahjohnson150/spatialnc
-    python: 3.6
+    repo: USDA-ARS-NWRC/spatialnc
+  password:
+    secure: dX+qCGKrviPAg6Ukx9QPn+xjmsH9FhIb877z7AJi0w1cOyYPh5xL315MPBAPHjmJgheufxd2sjoip2rPY9Nu5GHrFEEPQAhdfHKWl8sDmJjknPjg+G8RsYfcM8PYCvZ8x0OOwffLeM0Ih/yHFP13Kx9onlTJjoTL3hCS9VedcqZlN4ydQDB4mWylLie/BJ9nsIgh7LO5NfNPv76JITTXwYR0SQYJaI27GHM4GYZsd9T30A6M4yxfVL3+11wPIxfBAuQ6Sv9rBoixkSUxK6ip5S1DzxmLEUIHu0aEic7v4daNY1anjkgHAqy+AZFq9Xzz111EWgAMQpiKCBBXwoUJRr1kgbVc+ic/Xz0kFWxGY9tqUgbJz5cZNUdzXp8IbE31lEHyah1PjCorXommbPxgQS+ScIsbmgnA+4wG34FjP8/NhvynRGr5WY+5KtBgOyGkKYwSKxXgmIcFixcc0ZGil+hGSMNuTqUn1yePtNumRSrKVKqDB3OOSlVq1FsuI78zkY5DRQ5G8mNxD9k2S3MRNJ1qk2MmHdvOSmcc8AhD+PzkifXoBtnhaxQujze9KjL6kwqPPHBbVkIn6Z8l4xhfk68/VB9eCl7j2rd+hAgI3gSK91F5KZcPE6AgEKQRgUE/2wlQ+8loKjZD3yl9qRr4LmQPkN60aoaPqsubhj8A0s4=
+
