@@ -2,18 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import os
 import sys
 import time
-from collections import OrderedDict
-from os.path import abspath, expanduser, isdir, isfile
+from os.path import abspath, expanduser
 
-import numpy as np
-import progressbar as pb
 from netCDF4 import Dataset
 
 from . import __version__
 from .analysis import get_stats
-from .utilities import get_logger
 from .proj import add_proj
 
 
@@ -22,15 +19,18 @@ def nc_stats():
     parser = argparse.ArgumentParser(
         description='Calculate Statistics on NetCDF Files.')
 
-    parser.add_argument('filename', metavar='f', type=str,
-                        help='Path of a netcdf file (File Extension = .nc).')
+    parser.add_argument(
+        'filename', metavar='f', type=str,
+        help='Path of a netcdf file (File Extension = .nc).')
 
-    parser.add_argument('-v', '--variables', dest='variables', type=str, nargs='+',
-                        help='Name of the variable(s) in the netcdf file to process.')
+    parser.add_argument(
+        '-v', '--variables', dest='variables', type=str, nargs='+',
+        help='Name of the variable(s) in the netcdf file to process.')
 
-    parser.add_argument('-p', '--precision', dest='precision', type=int,
-                        default=4,
-                        help='Number of decimals to show in the results.')
+    parser.add_argument(
+        '-p', '--precision', dest='precision', type=int,
+        default=4,
+        help='Number of decimals to show in the results.')
 
     parser.add_argument(
         '-idt',
@@ -138,7 +138,7 @@ def nc_stats():
     elif ND == 1:
         slices = (dimensions[0])
     else:
-        print('ERROR: nc_stats is unable to handle {} dimensional data.\n'.format(ND))
+        print('ERROR: nc_stats is unable to handle {} dimensional data.\n'.format(ND))  # noqa
         sys.exit()
 
     # Loop through all variables and print out results
@@ -155,13 +155,19 @@ def nc_stats():
             data = ds.variables[v][slices]
 
             print("  Data Dimensions: {0}"
-                  "".format(" X ".join([str(s) for s in ds.variables[v].shape])))
+                  "".format(" X ".join(
+                      [str(s) for s in ds.variables[v].shape])
+                  ))
 
             if user_slicing:
                 print("  Filtered Dimensions: {0}"
-                      "".format(" X ".join([str(s) for s in data.shape])))
+                      "".format(
+                          " X ".join([str(s) for s in data.shape])
+                      ))
                 print('  Using indicies [{}]'.format(
-                    ", ".join(["{}:{}".format(s.start, s.stop) for s in slices])))
+                    ", ".join(
+                        ["{}:{}".format(s.start, s.stop) for s in slices])
+                ))
 
             print('')
 
@@ -214,9 +220,10 @@ def make_projected_nc():
         y_n = 'a'  # set a funny value to y_n
         # while it is not y or n (for yes or no)
         while y_n not in ['y', 'n']:
-            y_n = input('The script make_projected_nc will modify the file '
-                        '{} by adding projection information. Would you like to '
-                        'proceed? (y n): '.format(old_nc))
+            y_n = input(
+                'The script make_projected_nc will modify the file '
+                '{} by adding projection information. Would you like to '
+                'proceed? (y n): '.format(old_nc))
 
             # if they say yes, add it
             if y_n.lower() == 'y':

@@ -1,9 +1,11 @@
-import unittest
-from spatialnc.utilities import *
-from netCDF4 import Dataset
-from os.path import abspath, join, isfile
-import spatialnc as spnc
 import os
+import unittest
+from os.path import abspath, isfile, join
+
+from netCDF4 import Dataset
+
+import spatialnc as spnc
+from spatialnc.utilities import *
 
 
 class TestUtilities(unittest.TestCase):
