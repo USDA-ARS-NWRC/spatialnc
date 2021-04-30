@@ -51,4 +51,9 @@ setup(
         'setuptools_scm',
         'pytest-runner'
     ],
+    extras_require={
+        'tests': [
+            'pytest',
+        ],
+    },
 )
