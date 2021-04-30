@@ -76,14 +76,12 @@ Ready to contribute? Here's how to set up `spatialnc` for local development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the
-   tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass flake8 and the tests::
 
     $ flake8 spatialnc tests
-    $ python setup.py test or py.test
-    $ tox
-
-   To get flake8 and tox, just pip install them into your virtualenv.
+    $ python setup.py test or pytest
+    
+   To get flake8, just pip install them into your virtualenv.
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -102,8 +100,8 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 2.7, 3.4, 3.5 and 3.6, and for PyPy. Check
-   https://travis-ci.org/micahjohnson150/spatialnc/pull_requests
+3. The pull request should work for Python 3.6 and above. Check
+   https://github.com/USDA-ARS-NWRC/spatialnc/actions
    and make sure that the tests pass for all supported Python versions.
 
 Tips
@@ -111,18 +109,15 @@ Tips
 
 To run a subset of tests::
 
-$ py.test tests.test_spatialnc
+$ pytest tests.test_spatialnc
 
 
-Deploying
----------
+Releasing to PyPI
+-----------------
+To create a new release on `Pypi.org <https://pypi.org/>`_, follow these steps:
 
-A reminder for the maintainers on how to deploy.
-Make sure all your changes are committed (including an entry in HISTORY.rst).
-Then run::
-
-$ bumpversion patch # possible: major / minor / patch
-$ git push
-$ git push --tags
-
-Travis will then deploy to PyPI if tests pass.
+#. Create a new release for spatialnc
+#. Name the tag and release the version number, for example `v0.4.1 <https://github.com/USDA-ARS-NWRC/spatialnc/releases/v0.4.1>`_
+#. Add documentation about the release and why it's different from the previous.
+   Especially highlight any changes that will break existing integrations.
+#. Publish new release which will trigger a build to release to PyPI
